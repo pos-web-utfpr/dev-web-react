@@ -1,0 +1,17 @@
+.header {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #c084fc, #6366f1, #38bdf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+}

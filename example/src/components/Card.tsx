@@ -1,41 +1,56 @@
-export default function Card() {
-    const name = "Fulano Silva";
+import styles from './Card.module.css';
 
-    const flight = null;
-    const gate = null;
+type CardProps = {
+    name: string,
+    flight?: number,
+    gate?: string,
+    items?: string[],
+    children?: React.ReactNode,
+}
 
-    // const flight = 816;
-    // const gate = "8";
+export default function Card({ name, flight, gate = "Não Definido", items = [], children }: CardProps) {
+    return <section className={styles.card}>
+        <h2 className={styles.title}>
+            Cartão de Embarque
+            <span>✈️</span>
+        </h2>
 
-    const items = [
-        "Bolsa",
-        "Mochila",
-        "Mochila de mão",
-        "Laptop",
-        "Tablet"
-    ]
+        <div className={styles.infoRow}>
+            <div className={styles.infoBlock}>
+                <span className={styles.label}>Passageiro</span>
+                <span className={styles.value}>{name}</span>
+            </div>
 
-    return <main>
-        <h2>Cartão de Embarque</h2>
+            <div className={styles.infoBlock}>
+                <span className={styles.label}>Portão</span>
+                <span className={styles.value}>{gate}</span>
+            </div>
+        </div>
 
-        <p><b>Passageiro:</b> {name}</p>
+        <div className={styles.infoRow}>
+            <div className={styles.infoBlock}>
+                <span className={styles.label}>Vôo</span>
+                <span className={styles.value}>{flight ? `#${flight}` : 'Não Definido'}</span>
+            </div>
+        </div>
 
-        {flight && <p><b>Vôo:</b> {flight}</p>}
+        <div className={styles.infoBlock}>
+            <span className={styles.baggageTitle}>Itens de Bagagem</span>
+            {items.length > 0 ? (
+                <ul className={styles.baggageList}>
+                    {items.map((item, index) => (
+                        <li key={index} className={styles.baggageItem}>
+                            {item}
+                        </li>
+                    ))}
+                </ul>
+            ) : (
+                <span className={styles.emptyBaggage}>Nenhum item registrado</span>
+            )}
+        </div>
 
-        <p>
-            <b>Portão:</b>
-            {gate ? gate : "Não Definido"}
-        </p>
-
-        <b>Itens de Bagagem:</b>
-
-        <ul>
-            {
-                items.map(item => <li>
-                    {item}
-                </li>)
-            }
-        </ul>
-
-    </main>
+        {children && <div className={styles.childrenContainer}>
+            {children}
+        </div>}
+    </section>
 }
