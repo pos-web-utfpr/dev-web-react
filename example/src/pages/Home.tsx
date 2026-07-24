@@ -1,34 +1,28 @@
-import Card from "../components/Card";
-import Footer from "../components/Footer";
 import Header from "../components/Header";
-import { passengers } from "../mocks/passengers";
+import FlightCard from "../components/FlightCard";
+import { flights } from "../mocks/flights";
 import styles from "./Home.module.css";
 
 export default function Home() {
-    return <div className={styles.container}>
-        <Header />
+  console.log("Home");
 
-        <main className={styles.mainContent}>
-            <div className={styles.cardsGrid}>
-                <Card name="Fulano" items={[]}>
-                    <p style={{ color: "#f87171", fontWeight: "bold" }}>
-                        <b>Observações: </b>
-                        Restrição alimentar;
-                    </p>
-                </Card>
+  return (
+    <main className={styles.container}>
+      <Header />
 
-                {
-                    passengers.map(passenger => <Card
-                        key={passenger.id}
-                        name={passenger.name}
-                        flight={passenger.flight}
-                        gate={passenger.gate}
-                        items={passenger.items}
-                    />)
-                }
-            </div>
-        </main>
+      <section className={styles.titleSection}>
+        <h2>Próximos Voos</h2>
+        <p>
+          Confira a lista de seus voos agendados e o status atualizado de cada
+          um.
+        </p>
+      </section>
 
-        <Footer />
-    </div>
+      <section className={styles.flightsList}>
+        {flights.map((flight) => (
+          <FlightCard key={flight.id} flight={flight} />
+        ))}
+      </section>
+    </main>
+  );
 }

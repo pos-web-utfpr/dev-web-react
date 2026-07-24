@@ -1,34 +1,32 @@
 .container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-.mainContent {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2.5rem;
-  padding: 3rem 1.5rem;
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 0 auto;
-  width: 100%;
-  flex: 1;
+  padding: 0 24px 48px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  color: #1f2937;
 }
 
-.cardsGrid {
+.titleSection {
+  margin: 40px 0 24px;
+}
+
+.titleSection h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.titleSection p {
+  font-size: 0.95rem;
+  color: #6b7280;
+  margin: 6px 0 0 0;
+}
+
+.flightsList {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 2rem;
+  gap: 16px;
+  margin-top: 24px;
   width: 100%;
-}
-
-@media (min-width: 768px) {
-  .cardsGrid {
-    flex-direction: row;
-    justify-content: center;
-    flex-wrap: wrap;
-    align-items: stretch;
-  }
 }

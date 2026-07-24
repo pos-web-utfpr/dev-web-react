@@ -1,0 +1,30 @@
+.user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  background-color: #f8fafc;
+  border: 1px solid #f1f5f9;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.user:hover {
+  background-color: #f1f5f9;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 0 2px #ffffff, 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #334155;
+  margin: 0;
+}
