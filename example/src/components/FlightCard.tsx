@@ -1,7 +1,8 @@
 import styles from "./FlightCard.module.css";
 import { formatDate } from "../helpers/date";
 import type { Flight } from "../mocks/flights";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Reminder from "./Reminder";
 
 export type FlightCardProps = {
   flight: Flight;
@@ -17,6 +18,10 @@ export default function FlightCard({ flight }: FlightCardProps) {
   const handleUpdateBaggage = () => {
     alert("Declaração de bagagem: " + baggage);
   };
+
+  useEffect(() => {
+    console.log("Effect da Bagagem: " + baggage);
+  }, [baggage]);
 
   return (
     <div className={styles.card}>
@@ -54,6 +59,7 @@ export default function FlightCard({ flight }: FlightCardProps) {
 
       <div className={styles.footer}>
         <span className={styles.label}>Embarque</span>
+        <Reminder />
         <span className={styles.time}>{formatDate(departure)}</span>
       </div>
     </div>

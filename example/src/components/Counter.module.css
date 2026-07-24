@@ -1,0 +1,16 @@
+.counter {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #059669;
+  font-variant-numeric: tabular-nums;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
