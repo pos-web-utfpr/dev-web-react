@@ -7,6 +7,7 @@ import { ModalsProvider } from "@mantine/modals";
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
 import "@mantine/dates/styles.css";
+import "@mantine/charts/styles.css";
 import { AppRouter } from "./AppRouter";
 import { mantineTheme } from "./theme/mantine-theme";
 
