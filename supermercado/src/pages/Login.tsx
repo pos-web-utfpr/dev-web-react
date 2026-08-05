@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
@@ -19,9 +19,11 @@ import {
   IconLogin,
   IconBuildingStore,
 } from "@tabler/icons-react";
+import { api } from "../services/api";
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const form = useForm({
     initialValues: {
@@ -45,15 +47,31 @@ export const Login: React.FC = () => {
     },
   });
 
-  const handleSubmit = (values: typeof form.values) => {
-    console.log(form.values);
+  const handleSubmit = async (values: typeof form.values) => {
+    setLoading(true);
+    try {
+      const response = await api.post("/login", {
+        email: values.email,
+        password: values.password,
+      });
 
-    notifications.show({
-      title: "Login realizado",
-      message: `Bem-vindo ao sistema ServeRest UI ERP (${values.email})!`,
-      color: "green",
-    });
-    navigate("/app");
+      if (response.data.authorization) {
+        localStorage.setItem("token", response.data.authorization);
+      }
+
+      notifications.show({
+        title: "Login realizado",
+        message:
+          response.data.message ||
+          `Bem-vindo ao sistema ServeRest ERP (${values.email})!`,
+        color: "green",
+      });
+      navigate("/app");
+    } catch (err: any) {
+      // A notificação visual de erro é tratada globalmente pelo interceptor do Axios em api.ts
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -90,6 +108,7 @@ export const Login: React.FC = () => {
             type="submit"
             variant="filled"
             fullWidth
+            loading={loading}
             leftSection={<IconLogin size={18} />}
             mt="sm"
           >

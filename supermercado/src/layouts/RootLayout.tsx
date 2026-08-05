@@ -11,11 +11,22 @@ import {
   NavLink as MantineNavLink,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { notifications } from '@mantine/notifications';
 import { IconDashboard, IconShoppingBag, IconLogout, IconBuildingStore } from '@tabler/icons-react';
 
 export const RootLayout: React.FC = () => {
   const [opened, { toggle, close }] = useDisclosure();
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    notifications.show({
+      title: 'Sessão encerrada',
+      message: 'Você saiu do sistema com sucesso.',
+      color: 'blue',
+    });
+    navigate('/login');
+  };
 
   return (
     <AppShell
@@ -43,7 +54,7 @@ export const RootLayout: React.FC = () => {
             color="red"
             size="xs"
             leftSection={<IconLogout size={16} />}
-            onClick={() => navigate('/login')}
+            onClick={handleLogout}
           >
             Sair
           </Button>

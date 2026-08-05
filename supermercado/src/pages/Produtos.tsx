@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { Link } from "react-router";
 import {
   Container,
@@ -17,6 +17,7 @@ import {
   Stack,
   Flex,
   Select,
+  Alert,
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
@@ -29,41 +30,39 @@ import {
   IconChevronDown,
   IconSelector,
   IconStar,
+  IconPencil,
+  IconAlertCircle,
 } from "@tabler/icons-react";
-import { mockProdutos } from "../mocks/serveRestMocks";
-import { CadastroProdutoModal } from "../components/CadastroProdutoModal";
+import { api } from "../services/api";
+import { useAsyncData } from "../hooks/useAsyncData";
 import type { Produto } from "../schemas/produto";
 
 type SortField = "nome" | "preco" | "quantidade";
 type SortDirection = "asc" | "desc";
 
 export const Produtos: React.FC = () => {
-  const [produtos, setProdutos] = useState<Produto[]>(mockProdutos);
-  const [modalOpened, setModalOpened] = useState(false);
+  const [localProdutos, setLocalProdutos] = useState<Produto[] | null>(null);
+  const [errorDismissed, setErrorDismissed] = useState(false);
+
+  // Fetch products using useAsyncData hook
+  const {
+    data: fetchedProdutos,
+    loading,
+    error,
+  } = useAsyncData(async () => {
+    const response = await api.get("/produtos");
+    return response.data.produtos as Produto[];
+  }, []);
+
+  const produtos = useMemo(() => {
+    return localProdutos ?? fetchedProdutos ?? [];
+  }, [localProdutos, fetchedProdutos]);
 
   // Pagination & Sorting state
   const [activePage, setActivePage] = useState(1);
   const [pageSize, setPageSize] = useState<number>(10);
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
-  const [loading, setLoading] = useState(true);
-
-  // Initial loading simulation of 2 seconds
-  useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Trigger 2s loading overlay when changing page or page size or sort
-  const triggerLoading = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-  };
 
   const handleSort = (field: SortField) => {
     let nextDirection: SortDirection = "asc";
@@ -72,24 +71,17 @@ export const Produtos: React.FC = () => {
     }
     setSortField(field);
     setSortDirection(nextDirection);
-    triggerLoading();
   };
 
   const handlePageChange = (page: number) => {
     setActivePage(page);
-    triggerLoading();
   };
 
   const handlePageSizeChange = (val: string | null) => {
     if (val) {
       setPageSize(Number(val));
       setActivePage(1);
-      triggerLoading();
     }
-  };
-
-  const handleAddProduto = (novoProduto: Produto) => {
-    setProdutos((prev) => [novoProduto, ...prev]);
   };
 
   const handleDelete = (id: string, nome: string) => {
@@ -104,7 +96,7 @@ export const Produtos: React.FC = () => {
       labels: { confirm: "Excluir produto", cancel: "Cancelar" },
       confirmProps: { color: "red" },
       onConfirm: () => {
-        setProdutos((prev) => prev.filter((p) => p._id !== id));
+        setLocalProdutos((prev) => (prev ?? fetchedProdutos ?? []).filter((p) => p._id !== id));
         notifications.show({
           title: "Produto excluído",
           message: `O produto "${nome}" foi removido do catálogo com sucesso.`,
@@ -172,14 +164,27 @@ export const Produtos: React.FC = () => {
               {produtos.length} produtos cadastrados
             </Badge>
             <Button
+              component={Link}
+              to="/app/produtos/novo"
               variant="filled"
               leftSection={<IconPlus size={18} />}
-              onClick={() => setModalOpened(true)}
             >
               Novo Produto
             </Button>
           </Group>
         </Group>
+
+        {error && !errorDismissed && (
+          <Alert
+            icon={<IconAlertCircle size={16} />}
+            title="Erro ao carregar produtos"
+            color="red"
+            withCloseButton
+            onClose={() => setErrorDismissed(true)}
+          >
+            {error}
+          </Alert>
+        )}
 
         {/* Section: Produtos em Destaque (Cards in Grid) */}
         <div>
@@ -190,7 +195,10 @@ export const Produtos: React.FC = () => {
 
           <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="lg">
             {produtosDestaque.map((produto) => (
-              <Card key={`destaque-${produto._id}`} style={{ justifyContent: "space-between" }}>
+              <Card
+                key={`destaque-${produto._id}`}
+                style={{ justifyContent: "space-between" }}
+              >
                 <div>
                   <Group justify="space-between" align="flex-start" mb="xs">
                     <Title order={3} lineClamp={1}>
@@ -251,7 +259,12 @@ export const Produtos: React.FC = () => {
               loaderProps={{ color: "blue", type: "dots" }}
             />
 
-            <Table highlightOnHover striped verticalSpacing="sm" horizontalSpacing="md">
+            <Table
+              highlightOnHover
+              striped
+              verticalSpacing="sm"
+              horizontalSpacing="md"
+            >
               <Table.Thead bg="gray.1">
                 <Table.Tr>
                   <Table.Th>
@@ -333,11 +346,23 @@ export const Produtos: React.FC = () => {
                           Detalhes
                         </Button>
                         <Button
+                          component={Link}
+                          to={`/app/produtos/${produto._id}/editar`}
+                          variant="subtle"
+                          color="orange"
+                          size="xs"
+                          leftSection={<IconPencil size={14} />}
+                        >
+                          Editar
+                        </Button>
+                        <Button
                           variant="subtle"
                           color="red"
                           size="xs"
                           leftSection={<IconTrash size={14} />}
-                          onClick={() => handleDelete(produto._id, produto.nome)}
+                          onClick={() =>
+                            handleDelete(produto._id, produto.nome)
+                          }
                         >
                           Excluir
                         </Button>
@@ -367,13 +392,6 @@ export const Produtos: React.FC = () => {
           </Flex>
         </Box>
       </Stack>
-
-      {/* Modal de Cadastro */}
-      <CadastroProdutoModal
-        opened={modalOpened}
-        onClose={() => setModalOpened(false)}
-        onSuccess={handleAddProduto}
-      />
     </Container>
   );
 };

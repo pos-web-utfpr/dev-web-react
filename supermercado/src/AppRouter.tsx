@@ -7,7 +7,9 @@ import { Dashboard } from './pages/Dashboard';
 import { Home } from './pages/Home';
 import { Login } from './pages/Login';
 import { NotFound } from './pages/NotFound';
+import { ProdutoCadastro } from './pages/ProdutoCadastro';
 import { ProdutoDetalhes } from './pages/ProdutoDetalhes';
+import { ProdutoEdicao } from './pages/ProdutoEdicao';
 import { Produtos } from './pages/Produtos';
 
 export const AppRouter: React.FC = () => {
@@ -26,7 +28,9 @@ export const AppRouter: React.FC = () => {
         <Route element={<RootLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="produtos" element={<Produtos />} />
+          <Route path="produtos/novo" element={<ProdutoCadastro />} />
           <Route path="produtos/:id" element={<ProdutoDetalhes />} />
+          <Route path="produtos/:id/editar" element={<ProdutoEdicao />} />
         </Route>
       </Route>
 
