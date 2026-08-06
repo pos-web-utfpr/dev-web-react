@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import { useForm } from "@mantine/form";
+import { zodResolver } from "mantine-form-zod-resolver";
 import { notifications } from "@mantine/notifications";
 import {
   Card,
@@ -20,31 +21,20 @@ import {
   IconBuildingStore,
 } from "@tabler/icons-react";
 import { api } from "../services/api";
+import { LoginSchema } from "../schemas/LoginSchema";
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  const form = useForm({
+  const form = useForm<LoginSchema>({
     initialValues: {
-      email: "",
-      password: "",
+      email: "fulano@qa.com",
+      password: "teste",
     },
 
     validateInputOnBlur: true,
-
-    validate: {
-      email: (value) => {
-        if (!value.trim()) return "O e-mail é obrigatório";
-        if (!/^\S+@\S+\.\S+$/.test(value)) return "Insira um e-mail válido";
-        return null;
-      },
-      password: (value) => {
-        if (!value) return "A senha é obrigatória";
-        if (value.length < 4) return "A senha deve ter pelo menos 4 caracteres";
-        return null;
-      },
-    },
+    validate: zodResolver(LoginSchema),
   });
 
   const handleSubmit = async (values: typeof form.values) => {
@@ -67,7 +57,7 @@ export const Login: React.FC = () => {
         color: "green",
       });
       navigate("/app");
-    } catch (err: any) {
+    } catch {
       // A notificação visual de erro é tratada globalmente pelo interceptor do Axios em api.ts
     } finally {
       setLoading(false);

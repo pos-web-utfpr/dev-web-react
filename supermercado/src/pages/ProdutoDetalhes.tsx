@@ -26,7 +26,7 @@ import {
 } from "@tabler/icons-react";
 import { api } from "../services/api";
 import { useAsyncData } from "../hooks/useAsyncData";
-import type { Produto } from "../schemas/produto";
+import { ProductSchema } from "../schemas/ProductSchema";
 
 export const ProdutoDetalhes: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -39,7 +39,7 @@ export const ProdutoDetalhes: React.FC = () => {
   } = useAsyncData(async () => {
     if (!id) throw new Error("ID do produto não informado.");
     const response = await api.get(`/produtos/${id}`);
-    return response.data as Produto;
+    return ProductSchema.parse(response.data);
   }, [id]);
 
   const handleDelete = () => {
@@ -54,13 +54,18 @@ export const ProdutoDetalhes: React.FC = () => {
       ),
       labels: { confirm: "Excluir produto", cancel: "Cancelar" },
       confirmProps: { color: "red" },
-      onConfirm: () => {
-        notifications.show({
-          title: "Produto excluído",
-          message: `O produto ${produto.nome} foi removido com sucesso.`,
-          color: "red",
-        });
-        navigate("/app/produtos");
+      onConfirm: async () => {
+        try {
+          const response = await api.delete(`/produtos/${produto._id}`);
+          notifications.show({
+            title: "Produto excluído",
+            message: response.data.message || `O produto ${produto.nome} foi removido com sucesso.`,
+            color: "red",
+          });
+          navigate("/app/produtos");
+        } catch {
+          // Notificação de erro tratada pelo interceptor em api.ts
+        }
       },
     });
   };

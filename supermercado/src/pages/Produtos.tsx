@@ -35,7 +35,8 @@ import {
 } from "@tabler/icons-react";
 import { api } from "../services/api";
 import { useAsyncData } from "../hooks/useAsyncData";
-import type { Produto } from "../schemas/produto";
+import { z } from "zod";
+import { ProductSchema, type Produto } from "../schemas/ProductSchema";
 
 type SortField = "nome" | "preco" | "quantidade";
 type SortDirection = "asc" | "desc";
@@ -49,9 +50,10 @@ export const Produtos: React.FC = () => {
     data: fetchedProdutos,
     loading,
     error,
+    refetch,
   } = useAsyncData(async () => {
     const response = await api.get("/produtos");
-    return response.data.produtos as Produto[];
+    return z.array(ProductSchema).parse(response.data.produtos);
   }, []);
 
   const produtos = useMemo(() => {
@@ -95,13 +97,19 @@ export const Produtos: React.FC = () => {
       ),
       labels: { confirm: "Excluir produto", cancel: "Cancelar" },
       confirmProps: { color: "red" },
-      onConfirm: () => {
-        setLocalProdutos((prev) => (prev ?? fetchedProdutos ?? []).filter((p) => p._id !== id));
-        notifications.show({
-          title: "Produto excluído",
-          message: `O produto "${nome}" foi removido do catálogo com sucesso.`,
-          color: "red",
-        });
+      onConfirm: async () => {
+        try {
+          const response = await api.delete(`/produtos/${id}`);
+          setLocalProdutos((prev) => (prev ?? fetchedProdutos ?? []).filter((p) => p._id !== id));
+          refetch();
+          notifications.show({
+            title: "Produto excluído",
+            message: response.data.message || `O produto "${nome}" foi removido do catálogo com sucesso.`,
+            color: "red",
+          });
+        } catch {
+          // Notificação tratada no interceptor do Axios em api.ts
+        }
       },
     });
   };

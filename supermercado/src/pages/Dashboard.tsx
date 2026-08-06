@@ -23,14 +23,36 @@ import {
   IconCalendar,
   IconTrendingUp,
 } from '@tabler/icons-react';
-import { mockProdutos, mockCarrinhos } from '../mocks/serveRestMocks';
+import { z } from 'zod';
+import { api } from '../services/api';
+import { useAsyncData } from '../hooks/useAsyncData';
+import { ProductSchema } from '../schemas/ProductSchema';
+import { CarrinhoSchema } from '../schemas/CarrinhoSchema';
 
 export const Dashboard: React.FC = () => {
-  const totalProdutos = mockProdutos.length;
+  // Fetch real products from API parsed with Zod
+  const { data: produtos } = useAsyncData(async () => {
+    const response = await api.get('/produtos');
+    return z.array(ProductSchema).parse(response.data.produtos);
+  }, []);
 
-  // Default date range: last 14 days (2026-07-21 to 2026-08-03)
+  // Fetch real cart/orders from API parsed with Zod (fallback to empty list if endpoint empty/unavailable)
+  const { data: carrinhos } = useAsyncData(async () => {
+    try {
+      const response = await api.get('/carrinhos');
+      if (response.data?.carrinhos) {
+        return z.array(CarrinhoSchema).parse(response.data.carrinhos);
+      }
+      return [];
+    } catch {
+      return [];
+    }
+  }, []);
+
+  const totalProdutos = produtos?.length ?? 0;
+
   const defaultStart = new Date(2026, 6, 21);
-  const defaultEnd = new Date(2026, 7, 3);
+  const defaultEnd = new Date(2026, 7, 31);
 
   const [dateValue, setDateValue] = useState<[Date | null, Date | null]>([
     defaultStart,
@@ -40,9 +62,10 @@ export const Dashboard: React.FC = () => {
   // Aggregate daily revenue filtered by date range
   const { chartData, totalFaturamento, totalVendas } = useMemo(() => {
     const [startDate, endDate] = dateValue;
+    const list = carrinhos ?? [];
 
-    // Filter carrinhos within selected date range
-    const carrinhosFiltrados = mockCarrinhos.filter((carrinho) => {
+    const carrinhosFiltrados = list.filter((carrinho) => {
+      if (!carrinho.data) return true;
       const dataCarrinho = new Date(`${carrinho.data}T00:00:00`);
 
       if (startDate && dataCarrinho < new Date(startDate.setHours(0, 0, 0, 0))) {
@@ -54,15 +77,15 @@ export const Dashboard: React.FC = () => {
       return true;
     });
 
-    // Group by date (YYYY-MM-DD -> DD/MM)
     const faturamentoPorData: Record<string, number> = {};
 
     carrinhosFiltrados.forEach((carrinho) => {
-      const [, mes, dia] = carrinho.data.split('-');
-      const dataFormatada = `${dia}/${mes}`;
-
-      faturamentoPorData[dataFormatada] =
-        (faturamentoPorData[dataFormatada] || 0) + carrinho.precoTotal;
+      if (carrinho.data) {
+        const parts = carrinho.data.split('-');
+        const dataFormatada = parts.length === 3 ? `${parts[2]}/${parts[1]}` : carrinho.data;
+        faturamentoPorData[dataFormatada] =
+          (faturamentoPorData[dataFormatada] || 0) + carrinho.precoTotal;
+      }
     });
 
     const data = Object.entries(faturamentoPorData).map(([date, faturamento]) => ({
@@ -80,7 +103,7 @@ export const Dashboard: React.FC = () => {
       totalFaturamento: totalFaturado,
       totalVendas: carrinhosFiltrados.length,
     };
-  }, [dateValue]);
+  }, [dateValue, carrinhos]);
 
   return (
     <Container size="lg" py="xl">

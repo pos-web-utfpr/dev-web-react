@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import {
   Container,
@@ -13,8 +13,10 @@ import {
   Textarea,
   Alert,
   Box,
+  LoadingOverlay,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { zodResolver } from 'mantine-form-zod-resolver';
 import { notifications } from '@mantine/notifications';
 import {
   IconArrowLeft,
@@ -25,53 +27,88 @@ import {
   IconDeviceFloppy,
   IconAlertCircle,
 } from '@tabler/icons-react';
-import { mockProdutos } from '../mocks/serveRestMocks';
+import { api } from '../services/api';
+import { useAsyncData } from '../hooks/useAsyncData';
+import { ProductSchema, ProductFormSchema } from '../schemas/ProductSchema';
 
 export const ProdutoEdicao: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [saving, setSaving] = useState(false);
 
-  const produto = mockProdutos.find((item) => item._id === id);
+  const {
+    data: produto,
+    loading: fetchingProduto,
+    error,
+  } = useAsyncData(async () => {
+    if (!id) throw new Error('ID do produto não informado.');
+    const response = await api.get(`/produtos/${id}`);
+    return ProductSchema.parse(response.data);
+  }, [id]);
 
-  const form = useForm({
+  const form = useForm<ProductFormSchema>({
     initialValues: {
-      nome: produto?.nome ?? '',
-      preco: produto?.preco ?? 0,
-      descricao: produto?.descricao ?? '',
-      quantidade: produto?.quantidade ?? 0,
+      nome: '',
+      preco: 0,
+      descricao: '',
+      quantidade: 0,
     },
 
     validateInputOnBlur: true,
-
-    validate: {
-      nome: (value) => {
-        if (!value.trim()) return 'O nome do produto é obrigatório';
-        if (value.trim().length < 2) return 'O nome deve ter pelo menos 2 caracteres';
-        return null;
-      },
-      preco: (value) => {
-        if (value === undefined || value === null || typeof value !== 'number' || isNaN(value)) {
-          return 'O preço é obrigatório';
-        }
-        if (value <= 0) return 'O preço deve ser maior que zero';
-        return null;
-      },
-      descricao: (value) => {
-        if (!value.trim()) return 'A descrição é obrigatória';
-        if (value.trim().length < 3) return 'A descrição deve ter pelo menos 3 caracteres';
-        return null;
-      },
-      quantidade: (value) => {
-        if (value === undefined || value === null || typeof value !== 'number' || isNaN(value)) {
-          return 'A quantidade é obrigatória';
-        }
-        if (value < 0) return 'A quantidade não pode ser negativa';
-        return null;
-      },
-    },
+    validate: zodResolver(ProductFormSchema),
   });
 
-  if (!id || !produto) {
+  useEffect(() => {
+    if (produto) {
+      form.setValues({
+        nome: produto.nome,
+        preco: produto.preco,
+        descricao: produto.descricao,
+        quantidade: produto.quantidade,
+      });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [produto]);
+
+  const handleSubmit = async (values: typeof form.values) => {
+    if (!id) return;
+    setSaving(true);
+    try {
+      const response = await api.put(`/produtos/${id}`, {
+        nome: values.nome,
+        preco: values.preco,
+        descricao: values.descricao,
+        quantidade: values.quantidade,
+      });
+
+      notifications.show({
+        title: 'Produto atualizado',
+        message: response.data.message || `O produto "${values.nome}" foi atualizado com sucesso!`,
+        color: 'blue',
+      });
+
+      navigate('/app/produtos');
+    } catch {
+      // Notificação de erro é tratada pelo interceptor do Axios
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (fetchingProduto) {
+    return (
+      <Container size="sm" py="xl" pos="relative" style={{ minHeight: 200 }}>
+        <LoadingOverlay
+          visible
+          zIndex={1000}
+          overlayProps={{ radius: 'sm', blur: 2 }}
+          loaderProps={{ color: 'blue', type: 'dots' }}
+        />
+      </Container>
+    );
+  }
+
+  if (error || !id) {
     return (
       <Container size="sm" py="xl">
         <Alert
@@ -80,7 +117,7 @@ export const ProdutoEdicao: React.FC = () => {
           icon={<IconAlertCircle size={20} />}
           mb="lg"
         >
-          Nenhum produto foi encontrado para edição com o ID "{id}".
+          {error || `Nenhum produto foi encontrado para edição com o ID "${id}".`}
         </Alert>
         <Button
           component={Link}
@@ -93,18 +130,6 @@ export const ProdutoEdicao: React.FC = () => {
       </Container>
     );
   }
-
-  const handleSubmit = (values: typeof form.values) => {
-    // Fake / Pronta para integração com a API no futuro
-    console.log('Editar produto (payload para API):', { id, ...values });
-
-    notifications.show({
-      title: 'Produto atualizado',
-      message: `O produto "${values.nome}" foi atualizado com sucesso!`,
-      color: 'blue',
-    });
-    navigate('/app/produtos');
-  };
 
   return (
     <Container size="sm" py="xl">
@@ -180,6 +205,7 @@ export const ProdutoEdicao: React.FC = () => {
                 type="submit"
                 variant="filled"
                 color="blue"
+                loading={saving}
                 leftSection={<IconDeviceFloppy size={18} />}
               >
                 Salvar Alterações
@@ -191,3 +217,4 @@ export const ProdutoEdicao: React.FC = () => {
     </Container>
   );
 };
+
