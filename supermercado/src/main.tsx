@@ -8,7 +8,7 @@ import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
 import "@mantine/dates/styles.css";
 import "@mantine/charts/styles.css";
-import { AppRouter } from "./AppRouter";
+import { AppRouter } from "./app-router";
 import { mantineTheme } from "./theme/mantine-theme";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

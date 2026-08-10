@@ -1,8 +1,4 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router";
-import { useForm } from "@mantine/form";
-import { zodResolver } from "mantine-form-zod-resolver";
-import { notifications } from "@mantine/notifications";
+import React from "react";
 import {
   Card,
   Title,
@@ -20,50 +16,22 @@ import {
   IconLogin,
   IconBuildingStore,
 } from "@tabler/icons-react";
-import { api } from "../services/api";
-import { LoginSchema } from "../schemas/LoginSchema";
+import type { UseLoginFormType } from "../../hooks/use-login";
+import type { LoginSchema } from "../../schemas/login-schema";
 
-export const Login: React.FC = () => {
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+interface LoginFormProps {
+  form: UseLoginFormType;
+  loading: boolean;
+  onSubmit: (values: LoginSchema) => void;
+  onNavigateHome: () => void;
+}
 
-  const form = useForm<LoginSchema>({
-    initialValues: {
-      email: "fulano@qa.com",
-      password: "teste",
-    },
-
-    validateInputOnBlur: true,
-    validate: zodResolver(LoginSchema),
-  });
-
-  const handleSubmit = async (values: typeof form.values) => {
-    setLoading(true);
-    try {
-      const response = await api.post("/login", {
-        email: values.email,
-        password: values.password,
-      });
-
-      if (response.data.authorization) {
-        localStorage.setItem("token", response.data.authorization);
-      }
-
-      notifications.show({
-        title: "Login realizado",
-        message:
-          response.data.message ||
-          `Bem-vindo ao sistema ServeRest ERP (${values.email})!`,
-        color: "green",
-      });
-      navigate("/app");
-    } catch {
-      // A notificação visual de erro é tratada globalmente pelo interceptor do Axios em api.ts
-    } finally {
-      setLoading(false);
-    }
-  };
-
+export const LoginForm: React.FC<LoginFormProps> = ({
+  form,
+  loading,
+  onSubmit,
+  onNavigateHome,
+}) => {
   return (
     <Card>
       <Group justify="center" gap="xs" mb="xs">
@@ -75,7 +43,7 @@ export const Login: React.FC = () => {
         Digite suas credenciais para acessar o painel
       </Text>
 
-      <form onSubmit={form.onSubmit(handleSubmit)}>
+      <form onSubmit={form.onSubmit(onSubmit)}>
         <Stack>
           <TextInput
             label="E-mail"
@@ -111,7 +79,7 @@ export const Login: React.FC = () => {
               type="button"
               c="dimmed"
               size="xs"
-              onClick={() => navigate("/")}
+              onClick={onNavigateHome}
             >
               Voltar para a página inicial
             </Anchor>
