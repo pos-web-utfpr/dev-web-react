@@ -1,75 +1,31 @@
-# React + TypeScript + Vite
+# Supermercado ServeRest ERP
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicação Web ERP desenvolvida em React + TypeScript + Vite, integrada à API local ServeRest para controle de catálogo, estoque e relatórios de produtos.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🛠️ Scripts e Comandos
 
-## React Compiler
+### Desenvolvimento
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+yarn dev       # Inicia o servidor de desenvolvimento Vite (http://localhost:5173)
+yarn build     # Compila a aplicação para produção
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 🧪 Testes Unitários (Vitest)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+yarn test      # Executa os testes unitários em modo watch
+yarn test:run  # Executa todos os testes unitários uma vez (CI/CD)
+yarn test:ui   # Abre a interface visual do Vitest
+```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 🎭 Testes End-to-End / E2E (Playwright + ServeRest Local)
 
+```bash
+yarn test:e2e        # Executa os testes E2E em modo headless
+yarn test:e2e:ui     # Executa os testes E2E na interface visual interativa
+yarn test:e2e:report # Abre o relatório HTML detalhado com capturas de tela
+yarn db:reset        # Reseta os arquivos do banco (.db) do ServeRest local
 ```

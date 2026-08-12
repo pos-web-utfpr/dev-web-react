@@ -88,6 +88,7 @@ export const RootLayout: React.FC = () => {
           >
             {({ isActive }) => (
               <MantineNavLink
+                component="div"
                 label="Dashboard"
                 leftSection={<IconDashboard size={20} />}
                 active={isActive}
@@ -104,6 +105,7 @@ export const RootLayout: React.FC = () => {
           >
             {({ isActive }) => (
               <MantineNavLink
+                component="div"
                 label="Produtos"
                 leftSection={<IconShoppingBag size={20} />}
                 active={isActive}

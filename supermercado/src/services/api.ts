@@ -2,7 +2,7 @@ import axios from "axios";
 import { notifications } from "@mantine/notifications";
 
 export const api = axios.create({
-  baseURL: "https://serverest.dev",
+  baseURL: import.meta.env.VITE_API_URL || "https://serverest.dev",
   headers: {
     "Content-Type": "application/json",
   },
