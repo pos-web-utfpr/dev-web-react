@@ -1,0 +1,55 @@
+name: CI Supermercado
+
+# Workflow de Integração Contínua (CI) para a aplicação de supermercado.
+# Disparado automaticamente em eventos de push e pull request na branch main.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  ci:
+    name: Pipeline de CI
+    runs-on: ubuntu-latest
+
+    # Define o diretório de trabalho padrão como a pasta 'supermercado'
+    defaults:
+      run:
+        working-directory: supermercado
+
+    steps:
+      # Etapa 1: Checkout do repositório
+      # Baixa o código fonte do repositório para o ambiente de execução do GitHub Actions.
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      # Etapa 2: Configuração do ambiente Node.js
+      # Configura a versão do Node.js (24.x LTS) e ativa o cache de dependências usando o Yarn.
+      - name: Configuração do ambiente Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'yarn'
+          cache-dependency-path: supermercado/yarn.lock
+
+      # Etapa 3: Instalação das dependências
+      # Instala exatamente as dependências descritas no arquivo yarn.lock.
+      - name: Instalação das dependências
+        run: yarn install --frozen-lockfile
+
+      # Etapa 4: Execução dos Testes Unitários
+      # Executa a suíte de testes unitários com Vitest em modo de execução única (run).
+      - name: Execução dos Testes Unitários
+        run: yarn test:run
+
+      # Etapa 5: Execução dos Testes E2E
+      # Instala os navegadores do Playwright juntamente com suas dependências de sistema
+      # e executa a suíte de testes ponta a ponta (E2E).
+      - name: Instalação dos navegadores do Playwright
+        run: yarn playwright install --with-deps
+
+      - name: Execução dos Testes E2E
+        run: yarn test:e2e
