@@ -16,7 +16,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <MantineProvider theme={mantineTheme}>
       <ModalsProvider>
         <Notifications />
-        <BrowserRouter>
+        <BrowserRouter basename={import.meta.env.BASE_URL}>
           <AppRouter />
         </BrowserRouter>
       </ModalsProvider>
