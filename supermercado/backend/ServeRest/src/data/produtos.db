@@ -1,9 +1,9 @@
 {"nome":"Logitech MX Vertical","preco":470,"descricao":"Mouse","quantidade":382,"_id":"BeeJh5lz3k6kSIzA"}
-{"nome":"Samsung 60 polegadas","preco":5240,"descricao":"TV","quantidade":49977,"_id":"K6leHdftCeOJj8BJ"}
-{"nome":"Tes","preco":1,"descricao":"asd","quantidade":1,"_id":"qNPfmOebx4sLNfUy"}
+{"nome":"Samsung 60 polegadas","preco":5240,"descricao":"TV Smart 4K UHD 60 polegadas","quantidade":49977,"_id":"K6leHdftCeOJj8BJ"}
+{"nome":"Monitor Gaming 144Hz","preco":1250,"descricao":"Monitor curvo alta performance","quantidade":15,"_id":"vo8tkGl62YlocDzZ"}
 {"$$indexCreated":{"fieldName":"nome","unique":false,"sparse":true}}
 {"$$indexCreated":{"fieldName":"preco","unique":false,"sparse":false}}
 {"$$indexCreated":{"fieldName":"quantidade","unique":false,"sparse":false}}
-{"nome":"Monitor Gaming 144Hz","preco":1250,"descricao":"Monitor curvo alta performance","quantidade":15,"_id":"vo8tkGl62YlocDzZ"}
-{"nome":"Samsung 60 polegadas","preco":5240,"descricao":"TV Smart 4K UHD 60 polegadas","quantidade":49977,"_id":"K6leHdftCeOJj8BJ"}
-{"$$deleted":true,"_id":"qNPfmOebx4sLNfUy"}
+{"$$indexCreated":{"fieldName":"nome","sparse":true}}
+{"$$indexCreated":{"fieldName":"preco"}}
+{"$$indexCreated":{"fieldName":"quantidade"}}

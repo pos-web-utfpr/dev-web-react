@@ -33,12 +33,16 @@ jobs:
         with:
           node-version: '24'
           cache: 'yarn'
-          cache-dependency-path: supermercado/yarn.lock
+          cache-dependency-path: |
+            supermercado/yarn.lock
+            supermercado/backend/ServeRest/yarn.lock
 
       # Etapa 3: Instalação das dependências
-      # Instala exatamente as dependências descritas no arquivo yarn.lock.
+      # Instala as dependências da aplicação web e do servidor local backend (ServeRest).
       - name: Instalação das dependências
-        run: yarn install --frozen-lockfile
+        run: |
+          yarn install --frozen-lockfile
+          yarn --cwd backend/ServeRest install --frozen-lockfile
 
       # Etapa 4: Execução dos Testes Unitários
       # Executa a suíte de testes unitários com Vitest em modo de execução única (run).
