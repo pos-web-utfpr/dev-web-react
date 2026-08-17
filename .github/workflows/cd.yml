@@ -1,0 +1,83 @@
+name: CD Supermercado - GitHub Pages
+
+# Disparo do workflow:
+# 1. Automaticamente no evento de push para a branch main.
+# 2. Manualmente via workflow_dispatch na aba Actions do GitHub.
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+# 1. Configuração de Permissões Globais e Concorrência
+# Permissões necessárias para leitura de conteúdo, geração do token OIDC e escrita no GitHub Pages.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Gerenciamento de concorrência: garante que apenas um deploy no GitHub Pages seja executado por vez,
+# enfileirando novos disparos sem cancelar deploys em andamento.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # Job de Build da aplicação
+  build:
+    name: Build e Preparação dos Artefatos
+    runs-on: ubuntu-latest
+
+    # Define o diretório de trabalho padrão como 'supermercado' para os comandos executados
+    defaults:
+      run:
+        working-directory: supermercado
+
+    steps:
+      # 2. Checkout do repositório
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      # 3. Configuração do ambiente Node.js (Node 24.x LTS) com cache via yarn
+      - name: Configurar Node.js (v24.x)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'yarn'
+          cache-dependency-path: supermercado/yarn.lock
+
+      # 4. Instalação das dependências
+      - name: Instalar dependências
+        run: yarn install --frozen-lockfile
+
+      # 5. Build da Aplicação e Suporte a SPA (Criação do 404.html)
+      - name: Build da aplicação e fallback para SPA (404.html)
+        run: |
+          yarn build
+          cp dist/index.html dist/404.html
+
+      # 6. Configuração e Upload do Artefato do GitHub Pages
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload do artefato do GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: supermercado/dist
+
+  # Job de Deploy no GitHub Pages
+  deploy:
+    name: Deploy no GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+
+    # Configuração do ambiente de implantação no GitHub Pages
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      # 7. Deploy no GitHub Pages utilizando actions/deploy-pages@v4
+      - name: Realizar Deploy no GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
