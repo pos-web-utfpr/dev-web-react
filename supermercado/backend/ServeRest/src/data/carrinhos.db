@@ -3,3 +3,7 @@
 {"$$indexCreated":{"fieldName":"precoTotal","unique":false,"sparse":false}}
 {"$$indexCreated":{"fieldName":"quantidadeTotal","unique":false,"sparse":false}}
 {"$$indexCreated":{"fieldName":"produtos.idProduto","unique":false,"sparse":false}}
+{"$$indexCreated":{"fieldName":"idUsuario"}}
+{"$$indexCreated":{"fieldName":"precoTotal"}}
+{"$$indexCreated":{"fieldName":"quantidadeTotal"}}
+{"$$indexCreated":{"fieldName":"produtos.idProduto"}}
