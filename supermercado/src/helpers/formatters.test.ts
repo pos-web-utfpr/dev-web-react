@@ -5,7 +5,7 @@ describe("formatters", () => {
   describe("formatCurrency", () => {
     it("deve formatar valor numérico para o padrão de moeda BRL (R$)", () => {
       const result = formatCurrency(12.5).replace(/\s/g, " ");
-      expect(result).toBe("R$ 12,50ERRO");
+      expect(result).toBe("R$ 12,50");
     });
 
     it("deve formatar zero corretamente", () => {
